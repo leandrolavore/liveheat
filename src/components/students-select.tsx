@@ -11,7 +11,7 @@ type StudentsSelectProps = {
 const StudentsSelect: React.FC<StudentsSelectProps> = ({ addStudent }) => {
   return (
     <div className="flex flex-col gap-4 w-full">
-      <h2 className="text-lg font-semibold mb-2">Available Students</h2>
+      <h2 className="text-lg font-semibold mb-2">Available Students 🧑‍🎓</h2>
       <CardDescription className="mb-2">Select copetitors</CardDescription>
       <Card className="max-h-96 overflow-y-scroll p-4">
         {students.map((s) => (
@@ -23,7 +23,8 @@ const StudentsSelect: React.FC<StudentsSelectProps> = ({ addStudent }) => {
               variant="ghost"
               onClick={() => addStudent(s)}
             >
-              <IoMdAdd className="text-lg" />
+              Add
+              <IoMdAdd className="text-lg text-green-600" />
             </Button>
           </div>
         ))}

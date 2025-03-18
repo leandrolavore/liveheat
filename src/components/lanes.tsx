@@ -12,7 +12,7 @@ type LanesProps = {
 const Lanes: React.FC<LanesProps> = ({ lanes, removeStudent }) => {
   return (
     <div className="flex flex-col gap-4 w-full">
-      <h2 className="text-lg font-semibold mb-2">Lanes</h2>
+      <h2 className="text-lg font-semibold mb-2">Lanes 🚥</h2>
       <CardDescription className="mb-2">Empty lanes will be removed</CardDescription>
       <Card className="max-h-96 overflow-y-scroll p-4">
         {students.map((_, index) => {
@@ -31,7 +31,8 @@ const Lanes: React.FC<LanesProps> = ({ lanes, removeStudent }) => {
                     variant="ghost"
                     onClick={() => removeStudent(student)}
                   >
-                    <IoMdRemove className="text-lg" />
+                    Remove
+                    <IoMdRemove className="text-lg text-red-600" />
                   </Button>
                 </div>
               ) : (

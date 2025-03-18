@@ -5,7 +5,7 @@ import { Card, CardDescription } from './ui/card';
 const Results = ({ finishedRace }: { finishedRace?: TRace }) => {
   return (
     <div className='flex flex-col gap-4 w-full'>
-      <h2 className="text-lg font-semibold mb-2">Results</h2>
+      <h2 className="text-lg font-semibold mb-2">Results 🏆</h2>
       <CardDescription className="mb-2">Positions</CardDescription>
       <Card className="max-h-96 overflow-y-scroll p-4 flex-1">
         {!finishedRace || finishedRace?.finishingPositions.size === 0 ? (

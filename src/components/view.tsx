@@ -78,7 +78,7 @@ const View = () => {
           disabled={lanes.size === 0}
           onClick={startCompetition}
         >
-          {finishedRace ? 'Repeat Race' : 'Start Race'}
+          {finishedRace ? 'Repeat Race' : 'Start Race'} 🏁
         </Button>
       </CardFooter>
     </Card>
