@@ -4,7 +4,7 @@ export type TStudent = {
 }
 
 // Using set to make sure there are no
-const students: TStudent[] = Array.from(
+export const students: TStudent[] = Array.from(
   new Set([
     { name: "Alice Johnson", id: 101 },
     { name: "Bob Smith", id: 102 },

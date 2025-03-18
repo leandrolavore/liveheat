@@ -21,7 +21,11 @@ export function createRace(students: TStudent[]) {
     return race;
   }
 
-  students.forEach((student, index) => {
+  const assignedStudents = new Set<number>();
+
+  for (let index = 0; index < students.length; index++) {
+    const student = students[index];
+
     if (race.lanes.has(index + 1)) {
       race.status = 'cancelled';
       race.errorMessage = `❌[Error: Duplicate lane assignment detected for lane ${index + 1}]`;
@@ -29,8 +33,16 @@ export function createRace(students: TStudent[]) {
       return race;
     }
 
+    if (assignedStudents.has(student.id)) {
+      race.status = 'cancelled';
+      race.errorMessage = `❌[Error: Student ${student.name} is already assigned to another lane]`;
+
+      return race;
+    }
+
     race.lanes.set(index + 1, student);
-  });
+    assignedStudents.add(student.id);
+  }
 
   if (race.lanes.size < 2) {
     race.status = 'cancelled';
@@ -43,6 +55,7 @@ export function createRace(students: TStudent[]) {
 
   return race;
 }
+
 
 export function simulateRace(race: TRace) {
   if (race.status !== 'ready') {
