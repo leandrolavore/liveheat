@@ -21,28 +21,54 @@ export function createRace(students: TStudent[]) {
     return race;
   }
 
+  return race;
+}
+
+export function assignStudentsToLanes(students: TStudent[]) {
+  const lanes = new Map<number, TStudent>();
   const assignedStudents = new Set<number>();
+  let errorMessage: string | undefined = undefined;
+
 
   for (let index = 0; index < students.length; index++) {
     const student = students[index];
 
-    if (race.lanes.has(index + 1)) {
-      race.status = 'cancelled';
-      race.errorMessage = `❌[Error: Duplicate lane assignment detected for lane ${index + 1}]`;
-
-      return race;
-    }
-
     if (assignedStudents.has(student.id)) {
-      race.status = 'cancelled';
-      race.errorMessage = `❌[Error: Student ${student.name} is already assigned to another lane]`;
+      errorMessage = `❌[Error: Student ${student.name} is already assigned to another lane]`;
+      return { lanes, errorMessage };
 
-      return race;
     }
-
-    race.lanes.set(index + 1, student);
+    lanes.set(index + 1, student);
     assignedStudents.add(student.id);
   }
+
+  return { lanes, errorMessage };
+}
+
+export function addLanesToRace({ race, lanes }: { race: TRace, lanes: Map<number, TStudent> }) {
+  const laneCounts = new Map<number, number>();
+
+  for (const lane of lanes.keys()) {
+    const student = lanes.get(lane);
+
+    if (Array.isArray(student)) {
+      race.status = 'cancelled';
+      race.errorMessage = `❌[Error: Lane ${lane} contains multiple students instead of one]`;
+
+      return race;
+    }
+
+    laneCounts.set(lane, (laneCounts.get(lane) || 0) + 1);
+
+    if (laneCounts.get(lane)! > 1) {
+      race.status = 'cancelled';
+      race.errorMessage = `❌[Error: Lane ${lane} has multiple students assigned]`;
+
+      return race;
+    }
+  }
+
+  race.lanes = lanes;
 
   if (race.lanes.size < 2) {
     race.status = 'cancelled';
@@ -52,10 +78,8 @@ export function createRace(students: TStudent[]) {
   }
 
   race.status = 'ready';
-
   return race;
 }
-
 
 export function simulateRace(race: TRace) {
   if (race.status !== 'ready') {

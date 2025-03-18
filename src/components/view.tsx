@@ -1,25 +1,32 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { getStudentsForRace } from '@/lib/students';
-import { createRace, simulateRace } from '@/lib/race';
+import { addLanesToRace, assignStudentsToLanes, createRace, simulateRace, TRace } from '@/lib/race';
 
 const View = () => {
   const [error, setError] = useState<string>();
+  const [finishedRace, setFinishedRace] = useState<TRace>();
+  console.log("🚀 ~ View ~ finishedRace:", finishedRace)
 
+  const startCompetition = () => {
+    const randomStudents = getStudentsForRace();
+    const race = createRace(randomStudents);
+    const { lanes, errorMessage } = assignStudentsToLanes(randomStudents);
 
-  const randomStudents = getStudentsForRace(0);
-  console.log('random students', randomStudents);
+    if (!lanes || errorMessage) {
+      setError('No lanes');
 
-  const randomRace = createRace(randomStudents);
-  console.log("🚀 ~ View ~ randomRace:", randomRace);
+      return;
+    }
 
-  if (randomRace.status === 'cancelled') {
-    setError(randomRace.errorMessage || 'There was an error putting the race together');
-  } else {
-    const finsihedRace = simulateRace(randomRace);
-    console.log("🚀 ~ View ~ finsihedRace:", finsihedRace);
+    const readyRace = addLanesToRace({ race, lanes });
+    setFinishedRace(simulateRace(readyRace))
   }
+
+  useEffect(() => {
+    startCompetition();
+  }, [])
 
   return (
     <div>

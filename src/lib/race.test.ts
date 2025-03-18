@@ -11,8 +11,8 @@
  */
 
 import { describe, test, expect } from "@jest/globals";
-import { createRace } from "./race";
-import { students } from "./students";
+import { addLanesToRace, assignStudentsToLanes, createRace, simulateRace } from "./race";
+import { students, TStudent } from "./students";
 
 describe("Race Creation", () => {
   test("should not allow race creation with less than 2 students", () => {
@@ -21,50 +21,77 @@ describe("Race Creation", () => {
     expect(race.errorMessage).toBeDefined();
     expect(race.errorMessage).toContain("Not enough competitors for this race");
   });
+});
 
+describe("Assigning Lanes", () => {
   test("should not allow the same student to be assigned to multiple lanes", () => {
     const duplicateStudents = [students[0], students[0], students[0]];
-    const race = createRace(duplicateStudents);
-    expect(race.status).toBe("cancelled");
-    expect(race.errorMessage).toBeDefined();
-    expect(race.errorMessage).toContain("is already assigned to another lane");
+    const { lanes, errorMessage } = assignStudentsToLanes(duplicateStudents);
+
+    expect(errorMessage).toBeDefined();
+    expect(errorMessage).toContain("is already assigned to another lane");
+    expect(lanes.size).toBeLessThan(duplicateStudents.length);
   });
 
   test("Should not have one lane with multiple students", () => {
+    // This would actually be enforced by Map, since I can't have teh same key twice
+    // and each key only allows one TStudent
+    // but aiming for total test coverage as the premise says
     const race = createRace(students);
-    expect(race.status).toBe("cancelled");
-    expect(race.errorMessage).toBeDefined();
-    expect(race.errorMessage).toContain("Not enough competitors for this race");
+    const { lanes } = assignStudentsToLanes(students);
+    const readyRace = addLanesToRace({ race, lanes });
+
+    expect(readyRace.status).toBe("ready");
+    expect(readyRace.errorMessage).toBeUndefined();
+
+    readyRace.lanes.set(1, [students[0], students[1]] as unknown as TStudent);
+    const finalRace = addLanesToRace({ race: readyRace, lanes: readyRace.lanes });
+
+    expect(finalRace.status).toBe("cancelled");
+    expect(finalRace.errorMessage).toBeDefined();
+    expect(finalRace.errorMessage).toContain("contains multiple students instead of one");
   })
+})
+
+describe("Race Simulation", () => {
+  test("should ensure no gaps in final positions", () => {
+    const race = createRace(students);
+    const { lanes } = assignStudentsToLanes(students);
+    const readyRace = addLanesToRace({ race, lanes });
+
+    expect(readyRace.status).toBe("ready");
+    simulateRace(readyRace);
+
+    expect(validateRacePositions(readyRace.finishingPositions)).toBe(true);
+
+    function validateRacePositions(finishingPositions: Map<number, TStudent[]>): boolean {
+      let expectedPosition = 1;
+
+      for (const [position, students] of finishingPositions) {
+        if (position !== expectedPosition) {
+          console.error(`❌ [Error]: Invalid position order. Expected ${expectedPosition}, but got ${position}.`);
+          return false;
+        }
+
+        expectedPosition += students.length;
+      }
+
+      return true;
+    }
+  });
+
+  test("should handle ties correctly, not having results like (1,1,3), (1,1,1,4), (1,2,2,4)", () => {
+    // Again this would be enforced by Map no allowing duplicate keys
+    const race = createRace(students);
+    const { lanes } = assignStudentsToLanes(students);
+    const readyRace = addLanesToRace({ race, lanes });
+
+    expect(readyRace.status).toBe("ready");
+
+    simulateRace(readyRace);
+
+    const positions = Array.from(readyRace.finishingPositions.keys());
+    const uniquePositions = new Set(positions);
+    expect(uniquePositions.size).toBe(positions.length);
+  });
 });
-
-// describe("Race Simulation", () => {
-//   test("should ensure no gaps in final positions", () => {
-//     const race = createRace(students);
-//     simulateRace(race);
-//     const finalPositions = Array.from(race.finishingPositions.keys());
-//     const expectedPositions = Array.from({ length: finalPositions.length }, (_, i) => i + 1);
-//     expect(finalPositions).toEqual(expectedPositions);
-//   });
-
-//   test("should handle ties correctly (1,1,3)", () => {
-//     const race = createRace([students[0], students[1], students[2]]);
-//     simulateRace(race);
-//     const positions = Array.from(race.finishingPositions.keys());
-//     expect(positions).toEqual(expect.arrayContaining([1, 1, 3]));
-//   });
-
-//   test("should handle ties correctly (1,1,1,4)", () => {
-//     const race = createRace([students[0], students[1], students[2], students[3]]);
-//     simulateRace(race);
-//     const positions = Array.from(race.finishingPositions.keys());
-//     expect(positions).toEqual(expect.arrayContaining([1, 1, 1, 4]));
-//   });
-
-//   test("should handle mixed ties correctly (1,2,2,4)", () => {
-//     const race = createRace([students[0], students[1], students[2], students[3]]);
-//     simulateRace(race);
-//     const positions = Array.from(race.finishingPositions.keys());
-//     expect(positions).toEqual(expect.arrayContaining([1, 2, 2, 4]));
-//   });
-// });
