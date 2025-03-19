@@ -48,10 +48,7 @@ const StudentsSelect: React.FC<StudentsSelectProps> = ({ addStudent }) => {
       ...prev,
       {
         id: parseInt(nanoid(8), 36),
-        name: `
-          ${capitalizeFirstLetter(values.firstname)}
-          ${capitalizeFirstLetter(values.lastname)}
-        `
+        name: `${capitalizeFirstLetter(values.firstname)} ${capitalizeFirstLetter(values.lastname)}`
       }
     ]);
 
