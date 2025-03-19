@@ -63,11 +63,11 @@ const View = () => {
   }
 
   return (
-    <Card className="w-full">
+    <Card className="h-full flex-1 justify-between w-full">
       <CardHeader>
-        <CardTitle className='text-4xl'>🏁 Race 🏁</CardTitle>
+        <CardTitle className='text-4xl text-center'>🏁 Race 🏁</CardTitle>
       </CardHeader>
-      <CardContent className="flex flex-col lg:flex-row gap-4 h-full">
+      <CardContent className="flex flex-col lg:flex-row gap-4 h-[640px]">
         <StudentsSelect addStudent={addStudent} />
         <Lanes lanes={lanes} removeStudent={removeStudent} />
         <Results finishedRace={finishedRace} />
@@ -75,7 +75,7 @@ const View = () => {
       <CardFooter className='ml-auto'>
         <Button
           className='cursor-pointer'
-          disabled={lanes.size === 0}
+          disabled={lanes.size <= 1}
           onClick={startCompetition}
         >
           {finishedRace ? 'Repeat Race' : 'Start Race'} 🏁
