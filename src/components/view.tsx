@@ -67,7 +67,7 @@ const View = () => {
       <CardHeader>
         <CardTitle className='text-4xl text-center'>🏁 Race 🏁</CardTitle>
       </CardHeader>
-      <CardContent className="flex flex-col lg:flex-row gap-4 h-[640px]">
+      <CardContent className="flex flex-col lg:flex-row gap-4 lg:h-[640px]">
         <StudentsSelect addStudent={addStudent} />
         <Lanes lanes={lanes} removeStudent={removeStudent} />
         <Results finishedRace={finishedRace} />
